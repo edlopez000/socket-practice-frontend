@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 const ENDPOINT = 'http://localhost:4001';
+
+const socket = io(ENDPOINT);
+
 function App() {
-  const [res, setRes] = useState('nothing here yet');
-  const [socket, setSocket] = useState();
+  const [connections, setConnections] = useState('nothing here yet');
 
   useEffect(() => {
-    const newSocket = io(ENDPOINT);
-    setSocket(newSocket);
-
-    newSocket.on('totalConnections', (data) => {
+    socket.on('totalConnections', (data) => {
       console.log(data);
-      setRes(data);
+      setConnections(data);
     });
-  }, []);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
 
   return (
     <>
-      <p>Total Connections in this session: {res}</p>
-      <br />
+      <p>Total Connections in this session: {connections}</p>
     </>
   );
 }
